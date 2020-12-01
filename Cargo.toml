@@ -1,0 +1,8 @@
+[package]
+name = "advent-of-code"
+version = "0.1.0"
+authors = ["tiago"]
+edition = "2018"
+publish = false
+
+[dependencies]
