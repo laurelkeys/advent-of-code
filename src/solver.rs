@@ -11,8 +11,8 @@ pub trait Solver {
     type Output1: Debug;
     type Output2: Debug;
 
-    fn solve_1st(&self, input: &Self::Input) -> Self::Output1;
-    fn solve_2nd(&self, input: &Self::Input) -> Self::Output2;
+    fn solve_1st(&self, input: &Self::Input) -> Option<Self::Output1>;
+    fn solve_2nd(&self, input: &Self::Input) -> Option<Self::Output2>;
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input;
 
     fn load_input<P: AsRef<Path>>(&self, p: P) -> io::Result<Self::Input> {
@@ -26,7 +26,7 @@ pub trait Solver {
             .load_input(input_file(day))
             .expect("unable to open input file");
 
-        println!("Solution 1: {:?}", self.solve_1st(&input));
-        println!("Solution 2: {:?}", self.solve_2nd(&input));
+        println!("Answer 1: {:?}", self.solve_1st(&input).expect("answer 1"));
+        println!("Answer 2: {:?}", self.solve_2nd(&input).expect("answer 2"));
     }
 }

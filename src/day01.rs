@@ -11,37 +11,37 @@ impl Solver for Day01 {
     type Output1 = u32;
     type Output2 = u32;
 
-    fn solve_1st(&self, input: &Self::Input) -> Self::Output1 {
+    fn solve_1st(&self, input: &Self::Input) -> Option<Self::Output1> {
         // @Note: while the natural solution would be to use a HashMap,
         // using a Vec with less than 2048 positions will do just fine.
         let mut has_complement = [false; (TARGET_SUM + 1) as usize];
 
         for &entry in input {
             if has_complement[entry as usize] {
-                return entry * (TARGET_SUM - entry);
+                return Some(entry * (TARGET_SUM - entry));
             }
             has_complement[(TARGET_SUM - entry) as usize] = true;
         }
 
-        panic!() // @Fixme: this is really ugly.. ugh
+        None
     }
 
-    fn solve_2nd(&self, input: &Self::Input) -> Self::Output2 {
+    fn solve_2nd(&self, input: &Self::Input) -> Option<Self::Output2> {
         // @Note: same idea as above.. but O(n^2) instead of O(n).
         let mut has_complement: [bool; (TARGET_SUM + 1) as usize];
 
-        for target_sum in input.iter().map(|&entry| TARGET_SUM - entry) {
+        for current_target in input.iter().map(|&entry| TARGET_SUM - entry) {
             has_complement = [false; (TARGET_SUM + 1) as usize];
 
-            for &entry in input.iter().filter(|&&entry| entry <= target_sum) {
+            for &entry in input.iter().filter(|&&entry| entry <= current_target) {
                 if has_complement[entry as usize] {
-                    return entry * (target_sum - entry) * (TARGET_SUM - target_sum);
+                    return Some(entry * (current_target - entry) * (TARGET_SUM - current_target));
                 }
-                has_complement[(target_sum - entry) as usize] = true;
+                has_complement[(current_target - entry) as usize] = true;
             }
         }
 
-        panic!() // @Fixme: this is really ugly.. ugh
+        None
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
@@ -52,6 +52,7 @@ impl Solver for Day01 {
             .collect::<Vec<u32>>();
 
         assert!(input.iter().all(|&entry| entry <= TARGET_SUM));
+        // eprintln!("{:?}", input);
 
         input
     }
