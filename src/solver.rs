@@ -1,18 +1,14 @@
 // Ref.: https://github.com/noirotm/advent-of-code-2019/blob/master/src/solver.rs
 
-use std::{fmt::Debug, fs::File, io, path::Path};
-
-fn input_file(day: i32) -> String {
-    format!("input/day{:02}.txt", day)
-}
+use std::{fmt::Display, fs::File, io, path::Path};
 
 pub trait Solver {
     type Input;
-    type Output1: Debug;
-    type Output2: Debug;
+    type Output1: Display;
+    type Output2: Display;
 
-    fn solve_1st(&self, input: &Self::Input) -> Option<Self::Output1>;
-    fn solve_2nd(&self, input: &Self::Input) -> Option<Self::Output2>;
+    fn solve_part1(&self, input: &Self::Input) -> Self::Output1;
+    fn solve_part2(&self, input: &Self::Input) -> Self::Output2;
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input;
 
     fn load_input<P: AsRef<Path>>(&self, p: P) -> io::Result<Self::Input> {
@@ -21,12 +17,14 @@ pub trait Solver {
         Ok(self.parse_input(f))
     }
 
-    fn solve(&self, day: i32) {
+    fn solve(&self, day: u8) {
+        let input_file_path = format!("input/day{:02}.txt", day);
+
         let input = self
-            .load_input(input_file(day))
+            .load_input(input_file_path)
             .expect("unable to open input file");
 
-        println!("Answer 1: {:?}", self.solve_1st(&input).expect("answer 1"));
-        println!("Answer 2: {:?}", self.solve_2nd(&input).expect("answer 2"));
+        println!("[Day {}] Answer 1: {}", day, self.solve_part1(&input));
+        println!("[Day {}] Answer 2: {}", day, self.solve_part2(&input));
     }
 }

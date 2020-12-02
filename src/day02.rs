@@ -7,36 +7,36 @@ pub struct Day02;
 pub struct Password(String);
 pub struct Policy {
     pub letter: char,
-    pub start: i32,
-    pub end: i32,
+    pub start: usize,
+    pub end: usize,
 }
 
 impl Solver for Day02 {
     type Input = Vec<(Policy, Password)>;
-    type Output1 = i32;
-    type Output2 = i32;
+    type Output1 = usize;
+    type Output2 = usize;
 
-    fn solve_1st(&self, input: &Self::Input) -> Option<Self::Output1> {
+    fn solve_part1(&self, input: &Self::Input) -> Self::Output1 {
         let mut valid_passwords = 0;
 
         for (policy, password) in input {
-            let letter_count = password.0.matches(policy.letter).count() as i32;
+            let letter_count = password.0.matches(policy.letter).count();
             if (policy.start..=policy.end).contains(&letter_count) {
                 valid_passwords += 1
             }
         }
 
-        Some(valid_passwords)
+        valid_passwords
     }
 
-    fn solve_2nd(&self, input: &Self::Input) -> Option<Self::Output2> {
+    fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
         let mut valid_passwords = 0;
 
         for (policy, password) in input {
             // @Note: a position equal to 1 refers to the first letter (i.e. index 0).
             if let (Some(fst), Some(snd)) = (
-                password.0.chars().nth((policy.start - 1) as usize),
-                password.0.chars().nth((policy.end - 1) as usize),
+                password.0.chars().nth(policy.start - 1),
+                password.0.chars().nth(policy.end - 1),
             ) {
                 // Exactly one of these positions must contain the given letter.
                 if (fst == policy.letter) ^ (snd == policy.letter) {
@@ -45,7 +45,7 @@ impl Solver for Day02 {
             }
         }
 
-        Some(valid_passwords)
+        valid_passwords
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
@@ -59,12 +59,14 @@ impl Solver for Day02 {
                 let letter = (*line.get(1).unwrap()).strip_suffix(":").unwrap();
                 let password = *line.get(2).unwrap();
 
+                assert_eq!(letter.len(), 1);
+                let letter = letter.chars().next().unwrap();
+                let start = range.next().unwrap().parse().unwrap();
+                let end = range.next().unwrap().parse().unwrap();
+                assert!(start < password.len() && end <= password.len());
+
                 (
-                    Policy {
-                        letter: letter.chars().next().unwrap(),
-                        start: range.next().unwrap().parse().unwrap(),
-                        end: range.next().unwrap().parse().unwrap(),
-                    },
+                    Policy { letter, start, end },
                     Password(password.to_string()),
                 )
             })
