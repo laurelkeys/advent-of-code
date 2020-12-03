@@ -49,7 +49,7 @@ impl Solver for Day02 {
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
-        let input = BufReader::new(r)
+        BufReader::new(r)
             .lines()
             .flatten()
             .map(|line| {
@@ -70,10 +70,6 @@ impl Solver for Day02 {
                     Password(password.to_string()),
                 )
             })
-            .collect::<Vec<(Policy, Password)>>();
-
-        // eprintln!("{:?}", input);
-
-        input
+            .collect::<Vec<(Policy, Password)>>()
     }
 }
