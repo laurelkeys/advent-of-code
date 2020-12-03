@@ -1,8 +1,5 @@
 use crate::solver::Solver;
-use std::{
-    fmt::Display,
-    io::{self, BufRead, BufReader},
-};
+use std::io::{self, BufRead, BufReader};
 
 /// https://adventofcode.com/2020/day/3
 pub struct Day03;
@@ -18,27 +15,30 @@ pub struct Grid {
 }
 
 #[derive(Copy, Clone)]
-struct Coord(usize, usize);
+struct Coord(usize, usize); // (x, y)
 #[derive(Copy, Clone)]
-struct Slope(usize, usize);
+struct Slope(usize, usize); // (right, down)
 
-const START: Coord = Coord(0, 0); // top-left (x, y)
+const START: Coord = Coord(0, 0); // top-left
 const SLOPE: Slope = Slope(3, 1); // right 3, down 1
 
-fn checked_positions(start: Coord, slope: Slope, width: usize, height: usize) -> Vec<Coord> {
-    assert!(slope.1 > 0);
+impl Grid {
+    /// Returns the coordinates of the cells that will be checked in the grid,
+    /// given a starting position `start` and the `slope`.
+    fn positions_on_slope(&self, start: Coord, slope: Slope) -> Vec<Coord> {
+        assert!(slope.1 > 0);
 
-    let mut checked_positions = vec![start];
-    for y in ((start.1 + slope.1)..=(height)).step_by(slope.1) {
-        let &Coord(x, _) = checked_positions.last().unwrap();
-        checked_positions.push(Coord((x + slope.0) % width, y));
+        (start.1..=self.height)
+            .step_by(slope.1)
+            .fold((vec![], start.0), |(mut positions, x), y| {
+                positions.push(Coord(x, y));
+                (positions, (x + slope.0) % self.width)
+            })
+            .0
     }
 
-    checked_positions
-}
-
-impl Grid {
-    fn count_trees(&self, positions: &[Coord]) -> usize {
+    /// Returns the number of grid cells, given by `positions`, that are trees.
+    fn count_trees_in(&self, positions: &[Coord]) -> usize {
         positions
             .iter()
             .filter(|&&Coord(x, y)| {
@@ -57,7 +57,7 @@ impl Solver for Day03 {
     type Output2 = usize;
 
     fn solve_part1(&self, input: &Self::Input) -> Self::Output1 {
-        input.count_trees(&checked_positions(START, SLOPE, input.width, input.height))
+        input.count_trees_in(&input.positions_on_slope(START, SLOPE))
     }
 
     fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
@@ -69,9 +69,7 @@ impl Solver for Day03 {
             Slope(1, 2), // right 1, down 2
         ]
         .iter()
-        .map(|&slope| {
-            input.count_trees(&checked_positions(START, slope, input.width, input.height))
-        })
+        .map(|&slope| input.count_trees_in(&input.positions_on_slope(START, slope)))
         .product()
     }
 
@@ -109,6 +107,9 @@ impl GridCell {
     }
 }
 
+/*
+use std::fmt::Display;
+
 impl Display for GridCell {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -129,3 +130,4 @@ impl Display for Grid {
         Ok(())
     }
 }
+*/

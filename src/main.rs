@@ -11,7 +11,8 @@ fn main() {
     let day: u8 = env::args()
         .nth(1)
         .and_then(|day| day.parse().ok())
-        .unwrap_or(latest_day().unwrap());
+        .or_else(|| latest_day().ok())
+        .expect("failed to parse day");
 
     match day {
         1 => day01::Day01 {}.solve(day), // 691771, 232508760
