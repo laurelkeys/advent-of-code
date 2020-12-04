@@ -1,3 +1,5 @@
+//! --- Day 1: Report Repair ---
+
 use crate::solver::Solver;
 use std::io::{self, BufRead, BufReader};
 

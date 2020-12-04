@@ -1,3 +1,5 @@
+//! --- Day 3: Toboggan Trajectory ---
+
 use crate::solver::Solver;
 use std::io::{self, BufRead, BufReader};
 

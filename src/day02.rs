@@ -1,3 +1,5 @@
+//! --- Day 2: Password Philosophy ---
+
 use crate::solver::Solver;
 use std::io::{self, BufRead, BufReader};
 

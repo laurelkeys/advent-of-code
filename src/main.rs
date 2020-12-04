@@ -3,6 +3,7 @@ use std::{env, fs::read_dir, io, path::Path};
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 mod solver;
 
 use solver::Solver;
@@ -18,6 +19,7 @@ fn main() {
         1 => day01::Day01 {}.solve(day), // 691771, 232508760
         2 => day02::Day02 {}.solve(day), // 546, 275
         3 => day03::Day03 {}.solve(day), // 209, 1574890240
+        4 => day04::Day04 {}.solve(day), // 260, 153
         _ => eprintln!("Day {} hasn't been solved yet 😅", day),
     }
 }
