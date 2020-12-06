@@ -19,14 +19,14 @@ impl Solver for Day06 {
     fn solve_part1(&self, input: &Self::Input) -> Self::Output1 {
         input
             .iter()
-            .map(|group_answers| Answer::union(group_answers).unwrap().yes_count())
+            .map(|group_answers| Answer::union_of(group_answers).unwrap().yes_count())
             .sum()
     }
 
     fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
         input
             .iter()
-            .map(|group_answers| Answer::intersection(group_answers).unwrap().yes_count())
+            .map(|group_answers| Answer::intersection_of(group_answers).unwrap().yes_count())
             .sum()
     }
 
@@ -37,11 +37,10 @@ impl Solver for Day06 {
         // Each group's answers are separated by a blank line, and
         // within each group, each person's answers are on a single line.
         input
-            .trim_end() // remove trailing newline
             .split("\n\n")
             .map(|group_answers| {
                 group_answers
-                    .split('\n')
+                    .split_whitespace()
                     .map(|person_answer| Answer::new(person_answer))
                     .collect::<Vec<_>>()
             })
@@ -51,56 +50,40 @@ impl Solver for Day06 {
 
 impl Answer {
     fn new(person_answer: &str) -> Self {
-        Answer(('a'..='z').enumerate().fold(
-            [false; QUESTION_COUNT],
-            |mut answers, (i, question)| {
-                if person_answer.contains(question) {
-                    answers[i] = true;
-                }
-                answers
-            },
-        ))
+        let mut answer = [false; QUESTION_COUNT];
+        for (i, question) in ('a'..='z').enumerate() {
+            answer[i] = person_answer.contains(question);
+        }
+        Answer(answer)
     }
 
     fn yes_count(&self) -> usize {
         self.0.iter().filter(|&&answer| answer).count()
     }
 
-    fn merge(&mut self, other: &Answer) {
-        for i in 0..QUESTION_COUNT {
-            self.0[i] |= other.0[i];
-        }
+    fn union_of(answers: &[Answer]) -> Option<Answer> {
+        Self::collapse(answers, |a, b| a || b)
     }
 
-    fn intersect(&mut self, other: &Answer) {
-        for i in 0..QUESTION_COUNT {
-            self.0[i] &= other.0[i];
-        }
+    fn intersection_of(answers: &[Answer]) -> Option<Answer> {
+        Self::collapse(answers, |a, b| a && b)
     }
 
-    fn union(answers: &[Answer]) -> Option<Answer> {
-        match answers.get(0) {
-            Some(first_answer) => {
-                let mut merged_answer = *first_answer;
-                for answer in &answers[1..] {
-                    merged_answer.merge(answer);
-                }
-                Some(merged_answer)
-            }
-            None => None,
-        }
-    }
-
-    fn intersection(answers: &[Answer]) -> Option<Answer> {
-        match answers.get(0) {
-            Some(first_answer) => {
-                let mut intersected_answer = *first_answer;
-                for answer in &answers[1..] {
-                    intersected_answer.intersect(answer);
-                }
-                Some(intersected_answer)
-            }
-            None => None,
+    fn collapse<F>(answers: &[Answer], f: F) -> Option<Answer>
+    where
+        F: Fn(bool, bool) -> bool,
+    {
+        match answers {
+            [first_answer, answers @ ..] => Some(answers.iter().fold(
+                *first_answer,
+                |mut collapsed_answer, answer| {
+                    for i in 0..QUESTION_COUNT {
+                        collapsed_answer.0[i] = f(collapsed_answer.0[i], answer.0[i]);
+                    }
+                    collapsed_answer
+                },
+            )),
+            _ => None,
         }
     }
 }
