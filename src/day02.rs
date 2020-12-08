@@ -57,9 +57,9 @@ impl Solver for Day02 {
             .map(|line| {
                 let line: Vec<&str> = line.split_whitespace().collect();
 
-                let mut range = (*line.get(0).unwrap()).split('-');
-                let letter = (*line.get(1).unwrap()).strip_suffix(":").unwrap();
-                let password = *line.get(2).unwrap();
+                let mut range = line[0].split('-');
+                let letter = line[1].strip_suffix(":").unwrap();
+                let password = line[2];
 
                 assert_eq!(letter.len(), 1);
                 let letter = letter.chars().next().unwrap();

@@ -4,26 +4,22 @@ use crate::solver::Solver;
 use std::{
     collections::HashSet,
     io::{self, BufRead, BufReader},
-    str::FromStr,
 };
 
 /// https://adventofcode.com/2020/day/8
 pub struct Day08;
 
-/// Each instruction consists of an operation and an argument.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub struct Instruction(Operation, i32);
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum Operation {
+#[derive(Copy, Clone, Debug)]
+/// Each instruction consists of an operation (opcode) and an argument.
+pub enum Instruction {
     /// Increases or decreases a single global value called
-    /// the accumulator by the value given in the argument.
-    Acc,
+    /// the accumulator, by the value given in the argument.
+    Acc(i32),
     /// Jumps to a new instruction relative to itself,
     /// using the argument value for the offset.
-    Jmp,
+    Jmp(i32),
     /// Stands for no operation - it does nothing.
-    Nop,
+    Nop(i32),
 }
 
 /// Represents the output of a program execution, with the final
@@ -41,29 +37,28 @@ fn execute(program: &[Instruction]) -> Output {
     // an instruction immediately after the last instruction in the file.
     let terminal = program.len() as i32;
 
-    let mut current = 0;
-    let mut executed = HashSet::new();
+    let mut current = 0; // program counter
+    let mut visited = HashSet::new();
 
     let terminates = loop {
         if current == terminal {
             break true;
         }
 
-        if executed.contains(&current) {
-            break false;
-        }
+        visited.insert(current);
 
-        let next = match program.get(current as usize).unwrap() {
-            Instruction(Operation::Nop, _) => current + 1,
-            Instruction(Operation::Jmp, offset) => current + offset,
-            Instruction(Operation::Acc, value) => {
+        current += match program[current as usize] {
+            Instruction::Acc(value) => {
                 accumulator += value;
-                current + 1
+                1
             }
+            Instruction::Jmp(offset) => offset,
+            Instruction::Nop(_) => 1,
         };
 
-        executed.insert(current);
-        current = next;
+        if visited.contains(&current) {
+            break false;
+        }
     };
 
     Output {
@@ -91,43 +86,24 @@ impl Solver for Day08 {
         // and make it terminate correctly.
         //
         // What is the value of the accumulator after the program terminates?
-        if let Output {
-            accumulator,
-            terminates: true,
-        } = execute(input)
-        {
-            return accumulator;
-        }
-
-        // @Cleanup: is this clone really necessary?
         let mut modified_input = input.clone();
 
         for (i, instruction) in input.iter().enumerate() {
-            match instruction {
-                Instruction(Operation::Nop, argument) => {
-                    modified_input[i] = Instruction(Operation::Jmp, *argument);
-                    if let Output {
-                        accumulator,
-                        terminates: true,
-                    } = execute(&modified_input)
-                    {
-                        return accumulator;
-                    }
-                    modified_input[i] = *instruction;
-                }
-                Instruction(Operation::Jmp, offset) => {
-                    modified_input[i] = Instruction(Operation::Nop, *offset);
-                    if let Output {
-                        accumulator,
-                        terminates: true,
-                    } = execute(&modified_input)
-                    {
-                        return accumulator;
-                    }
-                    modified_input[i] = *instruction;
-                }
-                _ => {}
+            modified_input[i] = match *instruction {
+                Instruction::Jmp(offset) => Instruction::Nop(offset),
+                Instruction::Nop(arg) if arg > 1 => Instruction::Jmp(arg),
+                _ => continue,
+            };
+
+            if let Output {
+                accumulator,
+                terminates: true,
+            } = execute(&modified_input)
+            {
+                return accumulator;
             }
+
+            modified_input[i] = *instruction; // swap back the original instruction
         }
 
         unreachable!()
@@ -137,28 +113,17 @@ impl Solver for Day08 {
         BufReader::new(r)
             .lines()
             .flatten()
-            .map(|instruction| {
-                let (op, arg) = {
-                    let mut instruction = instruction.splitn(2, ' ');
-                    let op = instruction.next().unwrap();
-                    let arg = instruction.next().unwrap();
-                    (Operation::from_str(op), arg.parse::<i32>())
-                };
-                Instruction(op.unwrap(), arg.unwrap())
+            .map(|line| {
+                let mut instruction = line.splitn(2, ' ');
+                let op = instruction.next().unwrap();
+                let arg = instruction.next().unwrap().parse::<i32>().unwrap();
+                match op {
+                    "acc" => Instruction::Acc(arg),
+                    "jmp" => Instruction::Jmp(arg),
+                    "nop" => Instruction::Nop(arg),
+                    _ => unreachable!(),
+                }
             })
             .collect()
-    }
-}
-
-impl FromStr for Operation {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "acc" => Ok(Operation::Acc),
-            "jmp" => Ok(Operation::Jmp),
-            "nop" => Ok(Operation::Nop),
-            _ => Err(()),
-        }
     }
 }
