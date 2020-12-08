@@ -6,11 +6,29 @@ mod day03;
 mod day04;
 mod day05;
 mod day06;
+mod day07;
 mod solver;
 
 use solver::Solver;
 
 fn main() {
+    if let Some(test_file_path) = env::args().nth(2) {
+        println!(" === TESTING === ");
+
+        let solver07 = day07::Day07 {};
+
+        let input = solver07
+            .load_input(test_file_path)
+            .expect("unable to open test file");
+
+        println!("[Day 7] Answer 1: {}", solver07.solve_part1(&input));
+        println!("[Day 7] Answer 2: {}", solver07.solve_part2(&input));
+        println!(" === TESTING === ");
+        return;
+    }
+
+    // @Fixme: remove before commit ^^^^^^^^
+
     let day: u8 = env::args()
         .nth(1)
         .and_then(|day| day.parse().ok())
@@ -24,6 +42,7 @@ fn main() {
         4 => day04::Day04 {}.solve(day), // 260, 153
         5 => day05::Day05 {}.solve(day), // 998, 676
         6 => day06::Day06 {}.solve(day), // 6249, 3103
+        7 => day07::Day07 {}.solve(day), // 185, 89084
         _ => eprintln!("Day {} hasn't been solved yet 😅", day),
     }
 }
