@@ -91,7 +91,7 @@ impl Solver for Day08 {
         for (i, instruction) in input.iter().enumerate() {
             modified_input[i] = match *instruction {
                 Instruction::Jmp(offset) => Instruction::Nop(offset),
-                Instruction::Nop(arg) if arg > 1 => Instruction::Jmp(arg),
+                Instruction::Nop(arg) => Instruction::Jmp(arg),
                 _ => continue,
             };
 
