@@ -9,6 +9,7 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
+mod day10;
 mod solver;
 
 use solver::Solver;
@@ -21,15 +22,16 @@ fn main() {
         .expect("failed to parse day");
 
     match day {
-        1 => day01::Day01 {}.solve(day), // 691771, 232508760
-        2 => day02::Day02 {}.solve(day), // 546, 275
-        3 => day03::Day03 {}.solve(day), // 209, 1574890240
-        4 => day04::Day04 {}.solve(day), // 260, 153
-        5 => day05::Day05 {}.solve(day), // 998, 676
-        6 => day06::Day06 {}.solve(day), // 6249, 3103
-        7 => day07::Day07 {}.solve(day), // 185, 89084
-        8 => day08::Day08 {}.solve(day), // 1489, 1539
-        9 => day09::Day09 {}.solve(day), // 23278925, 4011064
+        1 => day01::Day01 {}.solve(day),  // 691771, 232508760
+        2 => day02::Day02 {}.solve(day),  // 546, 275
+        3 => day03::Day03 {}.solve(day),  // 209, 1574890240
+        4 => day04::Day04 {}.solve(day),  // 260, 153
+        5 => day05::Day05 {}.solve(day),  // 998, 676
+        6 => day06::Day06 {}.solve(day),  // 6249, 3103
+        7 => day07::Day07 {}.solve(day),  // 185, 89084
+        8 => day08::Day08 {}.solve(day),  // 1489, 1539
+        9 => day09::Day09 {}.solve(day),  // 23278925, 4011064
+        10 => day10::Day10 {}.solve(day), // 1917, 113387824750592
         _ => eprintln!("Day {} hasn't been solved yet 😅", day),
     }
 }
