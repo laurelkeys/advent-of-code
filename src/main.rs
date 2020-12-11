@@ -10,6 +10,7 @@ mod day07;
 mod day08;
 mod day09;
 mod day10;
+mod day11;
 mod solver;
 
 use solver::Solver;
@@ -32,6 +33,7 @@ fn main() {
         8 => day08::Day08 {}.solve(day),  // 1489, 1539
         9 => day09::Day09 {}.solve(day),  // 23278925, 4011064
         10 => day10::Day10 {}.solve(day), // 1917, 113387824750592
+        11 => day11::Day11 {}.solve(day), // 2273,
         _ => eprintln!("Day {} hasn't been solved yet 😅", day),
     }
 }
