@@ -93,21 +93,19 @@ impl SeatingArea {
         let mut next_seats = self.seats.clone();
         let mut changed = false;
 
-        for row in 0..self.rows {
-            for col in 0..self.cols {
-                match self.seats[row][col] {
-                    Seat::Empty if become_occupied(neighbors(&neighborhood(&self, row, col))) => {
-                        next_seats[row][col] = Seat::Occupied;
-                        changed = true;
-                    }
-                    Seat::Occupied if become_empty(neighbors(&neighborhood(&self, row, col))) => {
-                        next_seats[row][col] = Seat::Empty;
-                        changed = true;
-                    }
-                    _ => {}
+        (0..self.rows).for_each(|row| {
+            (0..self.cols).for_each(|col| match self.seats[row][col] {
+                Seat::Empty if become_occupied(neighbors(&neighborhood(&self, row, col))) => {
+                    next_seats[row][col] = Seat::Occupied;
+                    changed = true;
                 }
-            }
-        }
+                Seat::Occupied if become_empty(neighbors(&neighborhood(&self, row, col))) => {
+                    next_seats[row][col] = Seat::Empty;
+                    changed = true;
+                }
+                _ => {}
+            })
+        });
 
         self.seats = next_seats;
         changed
