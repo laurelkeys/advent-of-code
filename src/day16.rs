@@ -20,7 +20,7 @@ fn is_valid(value: &Value, field: &Field) -> bool {
 
 /// Returns true iff `value` is valid for at least one field of `fields`.
 fn has_valid(value: &Value, fields: &[Field]) -> bool {
-    fields.iter().filter(|f| is_valid(value, f)).count() > 0
+    fields.iter().any(|f| is_valid(value, f))
 }
 
 impl Solver for Day16 {
