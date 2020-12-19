@@ -1,11 +1,9 @@
 //! --- Day 17: Conway Cubes ---
 
-use io::BufRead;
-
 use crate::solver::Solver;
 use std::{
     collections::{HashMap, HashSet},
-    io::{self, BufReader},
+    io::{self, BufRead, BufReader},
 };
 
 /// https://adventofcode.com/2020/day/17
