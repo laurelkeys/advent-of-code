@@ -12,35 +12,36 @@ pub enum Rule {
     Sequences(Vec<Vec<u8>>),
 }
 
-fn matches(msg: &str, rule: u8, rules: &HashMap<usize, Rule>) -> bool {
-    eat_matches(msg, rule, rules).contains(&Some(""))
+fn matches(msg: &str, rule: u8, rules: &HashMap<u8, Rule>) -> bool {
+    eat_matches(msg, rule, rules).contains(&"") // full match
 }
 
-fn eat_matches<'m>(msg: &'m str, rule: u8, rules: &HashMap<usize, Rule>) -> Vec<Option<&'m str>> {
-    match &rules[&(rule as usize)] {
-        Rule::Single(c) if msg.starts_with(*c) => vec![Some(&msg[1..])],
+fn eat_matches<'m>(msg: &'m str, rule: u8, rules: &HashMap<u8, Rule>) -> Vec<&'m str> {
+    match &rules[&rule] {
+        Rule::Single(c) if msg.starts_with(*c) => vec![&msg[1..]],
         Rule::Sequences(seqs) => seqs
             .iter()
             .flat_map(|seq| {
-                seq.iter().fold(vec![Some(msg)], |msg_matches, &seq_rule| {
+                seq.iter().fold(vec![msg], |msg_matches, &seq_rule| {
                     msg_matches
                         .into_iter()
-                        .flat_map(|msg_match| match msg_match {
-                            Some(msg_match) if msg_match != "" => {
+                        .flat_map(|msg_match| {
+                            if msg_match != "" {
                                 eat_matches(msg_match, seq_rule, rules)
+                            } else {
+                                vec![]
                             }
-                            _ => vec![None],
                         })
                         .collect()
                 })
             })
-            .collect::<Vec<Option<&str>>>(),
-        _ => vec![None],
+            .collect::<Vec<&str>>(),
+        _ => vec![],
     }
 }
 
 impl Solver for Day19 {
-    type Input = (HashMap<usize, Rule>, Vec<String>);
+    type Input = (HashMap<u8, Rule>, Vec<String>);
     type Output1 = usize;
     type Output2 = usize;
 
@@ -53,7 +54,7 @@ impl Solver for Day19 {
     fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
         let (rules, messages) = input;
 
-        let rules: HashMap<usize, Rule> = rules
+        let rules: HashMap<u8, Rule> = rules
             .iter()
             .map(|(&i, rule)| match i {
                 11 => (i, "42 31 | 42 11 31".parse().unwrap()),
@@ -73,7 +74,7 @@ impl Solver for Day19 {
         r.read_to_string(&mut input).unwrap();
         let mut input = input.trim_end().split("\n\n");
 
-        let rules: HashMap<usize, Rule> = input
+        let rules = input
             .next()
             .unwrap()
             .lines()
