@@ -11,43 +11,44 @@ pub struct Tile {
     image: [[char; 10]; 10],
 }
 
+fn match_tiles(tiles: &HashMap<usize, Tile>) -> HashMap<usize, Vec<usize>> {
+    let mut tiles_matches = HashMap::new();
+
+    for (&id, tile) in tiles.iter() {
+        'matching: for (&other_id, other_tile) in tiles.iter() {
+            if other_id == id {
+                continue 'matching;
+            }
+
+            for margin in tile.margins().iter() {
+                for other_margin in other_tile.margins().iter() {
+                    if *margin == *other_margin {
+                        tiles_matches
+                            .entry(id)
+                            .or_insert_with(Vec::new)
+                            .push(other_id);
+                        continue 'matching;
+                    }
+                }
+            }
+        }
+    }
+
+    tiles_matches
+}
+
 impl Solver for Day20 {
     type Input = HashMap<usize, Tile>;
     type Output1 = usize;
     type Output2 = usize;
 
     fn solve_part1(&self, input: &Self::Input) -> Self::Output1 {
-        let mut tile_matches = HashMap::new();
-
-        for (id, tile) in input.iter() {
-            // @Cleanup: ignore already matched margins.
-            let margins = tile.margins();
-
-            'matching: for (other_id, other_tile) in input.iter() {
-                if other_id == id {
-                    continue 'matching;
-                }
-
-                for margin in margins.iter() {
-                    for other_margin in other_tile.margins().iter() {
-                        if *margin == *other_margin {
-                            tile_matches
-                                .entry(id)
-                                .or_insert_with(Vec::new)
-                                .push(other_id);
-                            continue 'matching;
-                        }
-                    }
-                }
-            }
-        }
-
         // What do you get if you multiply together the IDs of the four corner tiles?
-        tile_matches
+        match_tiles(input)
             .iter()
-            .filter_map(|(&&id, matches)| {
+            .filter_map(|(&id, matches)| {
                 match matches.len() {
-                    2 => Some(id), // corner
+                    2 => Some(id), // corner tile
                     _ => None,
                 }
             })
@@ -146,3 +147,104 @@ impl Tile {
         ]
     }
 }
+
+/*
+// A sea monster will look like this:
+//                   #
+// #    ##    ##    ###
+//  #  #  #  #  #  #
+// where the spaces ' ' can be anything.
+#[rustfmt::skip]
+const SEA_MONSTER: [[char; 20]; 3] = [
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' '],
+    ['#', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#'],
+    [' ', '#', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', ' '],
+];
+
+#[derive(Copy, Clone, Debug)]
+enum Quarters {
+    One,   // 90 degrees
+    Two,   // 180 degrees
+    Three, // 270 degrees
+}
+
+#[derive(Copy, Clone, Debug)]
+struct Transform {
+    rotation: Option<Quarters>,
+    flipped: bool,
+}
+
+#[derive(Clone, Debug)]
+struct Fit {
+    transform: Transform,
+    top: Option<usize>,
+    bottom: Option<usize>,
+    left: Option<usize>,
+    right: Option<usize>,
+}
+
+impl Fit {
+    fn new(tile: &Tile, matches: &[&Tile]) -> Self {
+        //  Self { transform, top, bottom, left, right }
+        todo!()
+    }
+
+    fn fits(&self) -> Vec<usize> {
+        [self.top, self.bottom, self.left, self.right]
+            .iter()
+            .filter_map(|margin| match margin {
+                Some(id) => Some(*id),
+                None => None,
+            })
+            .collect()
+    }
+}
+
+fn assemble_image(
+    tiles: &HashMap<usize, Tile>,
+    tiles_matches: &HashMap<usize, Vec<usize>>,
+) -> Vec<Vec<(usize, Fit)>> {
+    let mut tile_fits: HashMap<usize, Fit> = HashMap::new();
+
+    for (&id, tile_matches) in tiles_matches {
+        tile_fits.insert(
+            id,
+            Fit::new(
+                &tiles[&id],
+                &tile_matches
+                    .iter()
+                    .map(|&other_id| &tiles[&other_id])
+                    .collect::<Vec<_>>(),
+            ),
+        );
+    }
+
+    let n = (tiles.len() as f64).sqrt() as usize;
+    let mut image = vec![Vec::with_capacity(n); n];
+    let mut assembled = HashSet::new();
+
+    // Start building the image from the top-left corner.
+    let curr = (0, 0);
+
+    let curr_id = tile_fits
+        .iter()
+        .find(|(_, fit)| {
+            fit.top.is_none() && fit.bottom.is_some() && fit.left.is_none() && fit.right.is_some()
+        })
+        .map(|(id, _)| *id)
+        .unwrap();
+
+    let curr_fit = tile_fits.remove(&curr_id).unwrap();
+
+    while !tile_fits.is_empty() {
+        image[curr.0][curr.1] = (curr_id, curr_fit.clone());
+        assembled.insert(curr_id);
+
+        for other_id in curr_fit.fits() {
+            if !assembled.contains(&other_id) {}
+        }
+    }
+
+    image
+}
+*/
