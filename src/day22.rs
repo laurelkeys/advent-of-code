@@ -1,7 +1,6 @@
 //! --- Day 22: Crab Combat ---
 
 use crate::solver::Solver;
-
 use std::{
     collections::{hash_map::DefaultHasher, HashSet, VecDeque},
     hash::{Hash, Hasher},
