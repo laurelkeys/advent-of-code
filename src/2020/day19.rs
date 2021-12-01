@@ -26,7 +26,7 @@ fn eat_matches<'m>(msg: &'m str, rule: u8, rules: &HashMap<u8, Rule>) -> Vec<&'m
                     msg_matches
                         .into_iter()
                         .flat_map(|msg_match| {
-                            if msg_match != "" {
+                            if !msg_match.is_empty() {
                                 eat_matches(msg_match, seq_rule, rules)
                             } else {
                                 vec![]

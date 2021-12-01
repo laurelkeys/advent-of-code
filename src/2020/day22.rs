@@ -54,7 +54,7 @@ impl Solver for Day22 {
             let mut rounds = HashSet::new();
 
             while !(player1.is_empty() || player2.is_empty()) {
-                if !rounds.insert(hash(&player1, &player2)) {
+                if !rounds.insert(hash(player1, player2)) {
                     return 1; // this exact round had already been played
                 }
 

@@ -40,10 +40,7 @@ impl Solver for Day13 {
         let (earliest_timestamp, _) = buses
             .iter()
             .enumerate()
-            .filter_map(|(offset, bus)| match bus {
-                None => None,
-                Some(bus) => Some((offset, bus)),
-            })
+            .filter_map(|(offset, bus)| bus.as_ref().map(|bus| (offset, bus)))
             .fold(
                 (0, 1),
                 |(mut earliest_timestamp, timestep), (offset, bus)| {

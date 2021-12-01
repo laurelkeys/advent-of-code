@@ -55,7 +55,7 @@ impl Solver for Day20 {
             .product()
     }
 
-    fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
+    fn solve_part2(&self, _input: &Self::Input) -> Self::Output2 {
         todo!()
     }
 

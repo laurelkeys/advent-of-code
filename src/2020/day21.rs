@@ -45,7 +45,7 @@ impl Solver for Day21 {
         // Determine which ingredients cannot possibly contain any of the allergens in your list.
         // How many times do any of those ingredients appear?
         let mut ingredients_without_allergens = all_ingredients.clone();
-        for (_, ingredients_with_allergen) in allergen_possibilities(&foods).iter() {
+        for (_, ingredients_with_allergen) in allergen_possibilities(foods).iter() {
             ingredients_without_allergens
                 .retain(|ingredient| !ingredients_with_allergen.contains(ingredient));
         }
@@ -67,7 +67,7 @@ impl Solver for Day21 {
         let (foods, _) = input;
 
         // For each allergen, map the ingredients which possibly contain it.
-        let mut allergen_possibilities = allergen_possibilities(&foods);
+        let mut allergen_possibilities = allergen_possibilities(foods);
 
         // For each allergen, map the ingredient which actually contains it.
         let mut allergen_ingredient = HashMap::new();

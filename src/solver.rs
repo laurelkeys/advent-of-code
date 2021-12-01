@@ -2,6 +2,11 @@
 
 use std::{fmt::Display, fs::File, io, path::Path};
 
+pub enum SolverYear {
+    Aoc2020,
+    Aoc2021,
+}
+
 pub trait Solver {
     type Input;
     type Output1: Display;
@@ -17,8 +22,11 @@ pub trait Solver {
         Ok(self.parse_input(f))
     }
 
-    fn solve(&self, day: u8) {
-        let input_file_path = format!("input/day{:02}.txt", day);
+    fn solve(&self, year: SolverYear, day: u8) {
+        let input_file_path = match year {
+            SolverYear::Aoc2020 => format!("input/2020/day{:02}.txt", day),
+            SolverYear::Aoc2021 => format!("input/2021/day{:02}.txt", day),
+        };
 
         let input = self
             .load_input(input_file_path)
