@@ -26,25 +26,18 @@ impl Solver for Day01 {
     /// Count the number of times the sum of measurements in this sliding window increases.
     /// How many sums are larger than the previous sum?
     fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
-        fn window_sum(window: &[usize]) -> usize {
-            assert!(window.len() == 3);
-            window[0] + window[1] + window[2]
-        }
-
-        let mut windows = input.windows(3);
-        let first = windows.next().unwrap();
-        windows
-            .fold((first, 0), |(prev, count), curr| {
-                (
-                    curr,
-                    if window_sum(curr) > window_sum(prev) {
-                        count + 1
-                    } else {
-                        count
-                    },
-                )
-            })
-            .1
+        // Note that: if (B + C + D) > (A + B + C), then A < D.
+        input.windows(4).fold(0, |count, window| {
+            if let [curr, .., prev] = window {
+                if curr < prev {
+                    count + 1
+                } else {
+                    count
+                }
+            } else {
+                unreachable!()
+            }
+        })
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
