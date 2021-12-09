@@ -18,7 +18,7 @@ fn main() {
     let day: u8 = env::args()
         .nth(1)
         .and_then(|day| day.parse().ok())
-        .or_else(|| latest_day().ok())
+        .or_else(|| latest_day(YEAR).ok())
         .expect("failed to parse day");
 
     match YEAR {
@@ -36,6 +36,8 @@ fn solve_aoc_2021(day: u8) {
         5 => aoc2021::day05::Day05 {}.solve(Aoc2021, day), // 5124, 19771
         6 => aoc2021::day06::Day06 {}.solve(Aoc2021, day), // 349549, 1589590444365
         7 => aoc2021::day07::Day07 {}.solve(Aoc2021, day), // 336120, 96864235
+        8 => aoc2021::day08::Day08 {}.solve(Aoc2021, day), // 512, 1091165
+        9 => aoc2021::day09::Day09 {}.solve(Aoc2021, day), // 439,
         _ => eprintln!("Day {} hasn't been solved yet 😅", day),
     }
 }
@@ -71,12 +73,17 @@ fn solve_aoc_2020(day: u8) {
     }
 }
 
-fn latest_day() -> io::Result<u8> {
+fn latest_day(year: SolverYear) -> io::Result<u8> {
     fn parse_day(input_file_name: &str) -> Option<u8> {
         input_file_name[3..5].parse().ok() // e.g. maps "day25.txt" to 25
     }
 
-    let days = read_dir(Path::new(".").join("input"))?
+    let path = match year {
+        Aoc2020 => Path::new(".").join("input").join("2020"),
+        Aoc2021 => Path::new(".").join("input").join("2021"),
+    };
+
+    let days = read_dir(path)?
         .flatten()
         .filter_map(|entry| {
             entry

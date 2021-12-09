@@ -4,7 +4,6 @@ use crate::solver::Solver;
 use core::iter::Iterator;
 use std::{
     collections::HashMap,
-    convert::TryInto,
     io::{self, BufRead, BufReader},
 };
 

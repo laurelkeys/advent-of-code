@@ -2,6 +2,7 @@
 
 use std::{fmt::Display, fs::File, io, path::Path};
 
+#[derive(Clone, Copy)]
 pub enum SolverYear {
     Aoc2020,
     Aoc2021,
