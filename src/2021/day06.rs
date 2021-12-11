@@ -40,7 +40,7 @@ impl Solver for Day06 {
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
-        let input = BufReader::new(r)
+        BufReader::new(r)
             .lines()
             .flatten()
             .flat_map(|line| {
@@ -48,8 +48,6 @@ impl Solver for Day06 {
                     .map(|age| age.parse().unwrap())
                     .collect::<Vec<u8>>()
             })
-            .collect();
-
-        input
+            .collect()
     }
 }

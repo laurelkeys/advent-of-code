@@ -1,4 +1,4 @@
-use std::{env, fs::read_dir, io, path::Path};
+use std::{env, ffi::OsStr, fs::read_dir, io, path::Path};
 
 #[path = "./2020/mod.rs"]
 mod aoc2020;
@@ -91,8 +91,8 @@ fn latest_day(year: SolverYear) -> io::Result<u8> {
             entry
                 .path()
                 .file_name()
-                .and_then(|file_name| file_name.to_str())
-                .and_then(|file_name| parse_day(file_name))
+                .and_then(OsStr::to_str)
+                .and_then(parse_day)
         })
         .collect::<Vec<_>>();
 

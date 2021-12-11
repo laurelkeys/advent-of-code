@@ -36,12 +36,12 @@ impl Solver for Day11 {
     }
 
     ///
-    fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
+    fn solve_part2(&self, _input: &Self::Input) -> Self::Output2 {
         todo!()
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
-        let input = BufReader::new(r)
+        BufReader::new(r)
             .lines()
             .flatten()
             .map(|line| {
@@ -51,8 +51,8 @@ impl Solver for Day11 {
                     .try_into()
                     .unwrap()
             })
-            .collect::<Vec<[u8; 10]>>();
-
-        input.try_into().unwrap()
+            .collect::<Vec<[u8; 10]>>()
+            .try_into()
+            .unwrap()
     }
 }

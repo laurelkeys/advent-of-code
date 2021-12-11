@@ -31,13 +31,11 @@ impl Solver for Day10 {
     }
 
     ///
-    fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
+    fn solve_part2(&self, _input: &Self::Input) -> Self::Output2 {
         todo!()
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
-        let input = BufReader::new(r).lines().flatten().collect::<Vec<String>>();
-
-        input
+        BufReader::new(r).lines().flatten().collect::<Vec<String>>()
     }
 }

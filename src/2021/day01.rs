@@ -41,12 +41,10 @@ impl Solver for Day01 {
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
-        let input = BufReader::new(r)
+        BufReader::new(r)
             .lines()
             .flatten()
             .map(|line| line.parse().unwrap())
-            .collect::<Vec<usize>>();
-
-        input
+            .collect::<Vec<usize>>()
     }
 }

@@ -41,7 +41,7 @@ impl Solver for Day06 {
             .map(|group_answers| {
                 group_answers
                     .split_whitespace()
-                    .map(|person_answer| Answer::new(person_answer))
+                    .map(Answer::new)
                     .collect::<Vec<_>>()
             })
             .collect::<Vec<_>>()

@@ -113,7 +113,7 @@ impl Solver for Day08 {
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
-        let input = BufReader::new(r)
+        BufReader::new(r)
             .lines()
             .flatten()
             .map(|line| {
@@ -127,9 +127,7 @@ impl Solver for Day08 {
 
                 (patterns, output)
             })
-            .collect::<Vec<(Vec<String>, Vec<String>)>>();
-
-        input
+            .collect::<Vec<(Vec<String>, Vec<String>)>>()
     }
 }
 

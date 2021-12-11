@@ -65,7 +65,7 @@ impl Solver for Day05 {
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
-        let input = BufReader::new(r)
+        BufReader::new(r)
             .lines()
             .flatten()
             .map(|line| {
@@ -78,8 +78,6 @@ impl Solver for Day05 {
                     _ => unreachable!(),
                 }
             })
-            .collect::<Vec<((i32, i32), (i32, i32))>>();
-
-        input
+            .collect::<Vec<((i32, i32), (i32, i32))>>()
     }
 }
