@@ -8,7 +8,7 @@ pub struct Day10;
 
 impl Solver for Day10 {
     type Input = Vec<String>;
-    type Output1 = usize;
+    type Output1 = i32;
     type Output2 = usize;
 
     /// The navigation subsystem syntax is made of several lines containing chunks.
@@ -26,8 +26,36 @@ impl Solver for Day10 {
     /// Find the first illegal character in each corrupted line of the navigation subsystem.
     /// What is the total syntax error score for those errors?
     fn solve_part1(&self, input: &Self::Input) -> Self::Output1 {
-        println!("{:?}", &input);
-        todo!()
+        input
+            .iter()
+            .filter_map(|chunk| {
+                let mut openings = vec![];
+                for c in chunk.chars() {
+                    if "([{<".contains(c) {
+                        openings.push(c);
+                    } else {
+                        match openings.pop() {
+                            Some(o) => match o {
+                                '(' if c != ')' => return Some(c),
+                                '[' if c != ']' => return Some(c),
+                                '{' if c != '}' => return Some(c),
+                                '<' if c != '>' => return Some(c),
+                                _ => {}
+                            },
+                            None => return Some(c),
+                        }
+                    }
+                }
+                None
+            })
+            .map(|c| match c {
+                ')' => 3,
+                ']' => 57,
+                '}' => 1197,
+                '>' => 25137,
+                _ => unreachable!(),
+            })
+            .sum()
     }
 
     ///
