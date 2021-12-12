@@ -39,7 +39,8 @@ fn solve_aoc_2021(day: u8) {
         8 => aoc2021::day08::Day08 {}.solve(Aoc2021, day), // 512, 1091165
         9 => aoc2021::day09::Day09 {}.solve(Aoc2021, day), // 439, 900900
         10 => aoc2021::day10::Day10 {}.solve(Aoc2021, day), // 392421, 2769449099
-        11 => aoc2021::day11::Day11 {}.solve(Aoc2021, day), //
+        11 => aoc2021::day11::Day11 {}.solve(Aoc2021, day), // 1681, 276
+        12 => aoc2021::day12::Day12 {}.solve(Aoc2021, day), //
         _ => eprintln!("Day {} hasn't been solved yet 😅", day),
     }
 }
