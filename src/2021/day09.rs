@@ -83,7 +83,7 @@ impl Solver for Day09 {
             })
             .collect::<Vec<usize>>();
 
-        sizes.select_nth_unstable_by_key(3, |size| std::cmp::Reverse(*size));
+        sizes.select_nth_unstable_by_key(2, |size| std::cmp::Reverse(*size));
         sizes[..3].iter().product()
     }
 
