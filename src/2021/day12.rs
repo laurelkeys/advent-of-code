@@ -35,43 +35,31 @@ fn paths_from(
     cave: &Cave,
     connections: &HashMap<Cave, Vec<Cave>>,
     mut visited: HashSet<Cave>,
-    may_revisit: bool,
+    mut may_revisit: bool,
 ) -> usize {
     match *cave {
-        Cave::End => 1,
-        Cave::Start => 0,
-        Cave::Big(_) => connections.get(cave).map_or(0, |caves| {
-            caves
-                .iter()
-                .filter(|&next_cave| !visited.contains(next_cave) || may_revisit)
-                .fold(0, |paths, next_cave| {
-                    paths + paths_from(next_cave, connections, visited.clone(), may_revisit)
-                })
-        }),
+        Cave::End => return 1,
+        Cave::Start => return 0,
+        Cave::Big(_) => {}
         Cave::Small(_) => {
-            if visited.insert(cave.clone()) {
-                connections.get(cave).map_or(0, |caves| {
-                    caves
-                        .iter()
-                        .filter(|&next_cave| !visited.contains(next_cave) || may_revisit)
-                        .fold(0, |paths, next_cave| {
-                            paths + paths_from(next_cave, connections, visited.clone(), may_revisit)
-                        })
-                })
-            } else if may_revisit {
-                connections.get(cave).map_or(0, |caves| {
-                    caves
-                        .iter()
-                        .filter(|&next_cave| !visited.contains(next_cave))
-                        .fold(0, |paths, next_cave| {
-                            paths + paths_from(next_cave, connections, visited.clone(), false)
-                        })
-                })
-            } else {
-                0
+            if !visited.insert(cave.clone()) {
+                if !may_revisit {
+                    return 0;
+                } else {
+                    may_revisit = false;
+                }
             }
         }
     }
+
+    connections.get(cave).map_or(0, |caves| {
+        caves
+            .iter()
+            .filter(|&next_cave| may_revisit || !visited.contains(next_cave))
+            .fold(0, |paths, next_cave| {
+                paths + paths_from(next_cave, connections, visited.clone(), may_revisit)
+            })
+    })
 }
 
 impl Solver for Day12 {
