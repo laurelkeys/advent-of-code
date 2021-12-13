@@ -2,7 +2,7 @@
 
 use crate::solver::Solver;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     io::{self, BufRead, BufReader},
 };
 
@@ -31,30 +31,46 @@ impl Cave {
     }
 }
 
-fn paths_from(cave: &Cave, connections: &HashMap<Cave, Vec<Cave>>, visited: &[Cave]) -> usize {
+fn paths_from(
+    cave: &Cave,
+    connections: &HashMap<Cave, Vec<Cave>>,
+    mut visited: HashSet<Cave>,
+    may_revisit: bool,
+) -> usize {
     match *cave {
         Cave::End => 1,
         Cave::Start => 0,
-        Cave::Small(_) => visited.contains(cave).then(|| 0).unwrap_or({
-            let mut visited = visited.to_vec();
-            visited.push(cave.clone());
-            connections.get(cave).map_or(0, |caves| {
-                caves
-                    .iter()
-                    .filter(|&next_cave| !visited.contains(next_cave))
-                    .fold(0, |paths, next_cave| {
-                        paths + paths_from(next_cave, connections, &visited)
-                    })
-            })
-        }),
         Cave::Big(_) => connections.get(cave).map_or(0, |caves| {
             caves
                 .iter()
-                .filter(|&next_cave| !visited.contains(next_cave))
+                .filter(|&next_cave| !visited.contains(next_cave) || may_revisit)
                 .fold(0, |paths, next_cave| {
-                    paths + paths_from(next_cave, connections, visited)
+                    paths + paths_from(next_cave, connections, visited.clone(), may_revisit)
                 })
         }),
+        Cave::Small(_) => {
+            if visited.insert(cave.clone()) {
+                connections.get(cave).map_or(0, |caves| {
+                    caves
+                        .iter()
+                        .filter(|&next_cave| !visited.contains(next_cave) || may_revisit)
+                        .fold(0, |paths, next_cave| {
+                            paths + paths_from(next_cave, connections, visited.clone(), may_revisit)
+                        })
+                })
+            } else if may_revisit {
+                connections.get(cave).map_or(0, |caves| {
+                    caves
+                        .iter()
+                        .filter(|&next_cave| !visited.contains(next_cave))
+                        .fold(0, |paths, next_cave| {
+                            paths + paths_from(next_cave, connections, visited.clone(), false)
+                        })
+                })
+            } else {
+                0
+            }
+        }
     }
 }
 
@@ -68,7 +84,7 @@ impl Solver for Day12 {
     /// big caves any number of times.
     fn solve_part1(&self, input: &Self::Input) -> Self::Output1 {
         input[&Cave::Start].iter().fold(0, |paths, cave| {
-            paths + paths_from(cave, input, &[Cave::Start])
+            paths + paths_from(cave, input, HashSet::new(), false)
         })
     }
 
@@ -80,19 +96,23 @@ impl Solver for Day12 {
     ///
     /// Given these new rules, how many paths through this cave system are there?
     fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
-        todo!()
+        input[&Cave::Start].iter().fold(0, |paths, cave| {
+            paths + paths_from(cave, input, HashSet::new(), true)
+        })
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
         let mut connections = HashMap::new();
         for line in BufReader::new(r).lines().flatten() {
             let (from, to) = line.split_once('-').unwrap();
-            let (from, to) = (Cave::new(from), Cave::new(to));
             connections
-                .entry(from.clone())
+                .entry(Cave::new(from))
                 .or_insert_with(Vec::new)
-                .push(to.clone());
-            connections.entry(to).or_insert_with(Vec::new).push(from);
+                .push(Cave::new(to));
+            connections
+                .entry(Cave::new(to))
+                .or_insert_with(Vec::new)
+                .push(Cave::new(from));
         }
 
         connections
