@@ -25,18 +25,21 @@ pub struct TransparentPaper {
 
 impl Display for TransparentPaper {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_char('\n')?;
-        for y in 0..=self.max_y {
-            for x in 0..=self.max_x {
-                f.write_char(if self.dots.contains(&(x, y)) {
-                    '#'
-                } else {
-                    '.'
-                })?;
-            }
-            f.write_char('\n')?;
-        }
-        Ok(())
+        f.write_str(
+            &std::iter::once('\n')
+                .chain((0..=self.max_y).flat_map(|y| {
+                    (0..=self.max_x)
+                        .map(move |x| {
+                            if self.dots.contains(&(x, y)) {
+                                '█'
+                            } else {
+                                ' '
+                            }
+                        })
+                        .chain(std::iter::once('\n'))
+                }))
+                .collect::<String>(),
+        )
     }
 }
 
@@ -94,8 +97,8 @@ impl Solver for Day13 {
     /// What code do you use to activate the infrared thermal imaging camera system?
     fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
         let (paper, folds) = input;
-        let mut paper = paper.clone();
 
+        let mut paper = paper.clone();
         for fold in folds {
             paper = paper.fold_along(fold);
         }
