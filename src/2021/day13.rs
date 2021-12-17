@@ -3,7 +3,7 @@
 use crate::solver::Solver;
 use std::{
     collections::HashSet,
-    fmt::{Display, Write},
+    fmt::Display,
     io::{self, BufRead, BufReader},
 };
 
