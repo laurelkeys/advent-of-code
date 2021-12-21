@@ -12,6 +12,16 @@ pub enum Number {
     Pair(Box<(Number, Number)>),
 }
 
+/// The magnitude of a pair is 3 times the magnitude of its left element plus 2
+/// times the magnitude of its right element. The magnitude of a regular number
+/// is just that number.
+fn magnitude(number: &Number) -> u32 {
+    match number {
+        Number::Elem(value) => *value as u32,
+        Number::Pair(pair) => magnitude(&pair.0) * 3 + magnitude(&pair.1) * 2,
+    }
+}
+
 impl Solver for Day18 {
     type Input = Vec<Number>;
     type Output1 = u32;
@@ -22,10 +32,6 @@ impl Solver for Day18 {
     /// always be reduced, and the process of adding two snailfish numbers can result
     /// in snailfish numbers that need to be reduced.
     ///
-    /// The magnitude of a pair is 3 times the magnitude of its left element plus 2
-    /// times the magnitude of its right element. The magnitude of a regular number
-    /// is just that number.
-    ///
     /// Add up all of the snailfish numbers from the homework assignment in the order
     /// they appear. What is the magnitude of the final sum?
     fn solve_part1(&self, input: &Self::Input) -> Self::Output1 {
@@ -34,19 +40,26 @@ impl Solver for Day18 {
             reduce_number(sum)
         });
 
-        fn magnitude(number: &Number) -> u32 {
-            match number {
-                Number::Elem(value) => *value as u32,
-                Number::Pair(pair) => magnitude(&pair.0) * 3 + magnitude(&pair.1) * 2,
-            }
-        }
-
         magnitude(&input_sum.unwrap())
     }
 
+    /// What is the largest magnitude you can get from adding only two of the numbers?
     ///
+    /// Note that snailfish addition is not commutative -- that is, `x + y` and `y + x`
+    /// can produce different results.
     fn solve_part2(&self, input: &Self::Input) -> Self::Output2 {
-        todo!()
+        input
+            .iter()
+            .enumerate()
+            .flat_map(|(i, x)| {
+                input[..i].iter().map(move |y| {
+                    let x_plus_y = reduce_number(Number::Pair(Box::new((x.clone(), y.clone()))));
+                    let y_plus_x = reduce_number(Number::Pair(Box::new((y.clone(), x.clone()))));
+                    magnitude(&x_plus_y).max(magnitude(&y_plus_x))
+                })
+            })
+            .max()
+            .unwrap()
     }
 
     fn parse_input<R: io::Read>(&self, r: R) -> Self::Input {
